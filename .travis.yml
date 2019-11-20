@@ -15,32 +15,18 @@ addons:
     - gradle
 
 before_install:
-- pip3 install --user --upgrade setuptools
-- pip3 install --user GitPython github3.py Mako
-- "./git-setup.sh"
+  - pip3 install --user --upgrade setuptools
+  - pip3 install --user GitPython github3.py Mako
+  - "./git-setup.sh"
 
 script:
-- python3 jkind_fetcher.py -v -i [Vv]\(\\d+\\.\\d+\\.\\d+\) -e [Vv]\([123]\\.\\d+\\.\\d+\)
+  - python3 jkind_fetcher.py -v -i [Vv]\(\\d+\\.\\d+\\.\\d+\) -e [Vv]\([123]\\.\\d+\\.\\d+\)
 
 before_deploy:
   - export RELEASE_PKG_FILE=$(ls plugin/com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 
 deploy:
-  provider: releases
-    api-key: $GH_TOKEN
-    file: 
-      - "${RELEASE_PKG_FILE}"
-    name: Nightly development build ($SNAPSHOT_NUMBER)
-    body: Automated integration build of JKind API plugin $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
-      by Travis CI on $(date +'%F %T %Z').
-    prerelease: true
-    overwrite: false
-    skip_cleanup: true
-    target_commitish: $TRAVIS_COMMIT
-    on:
-      branch: master
-      condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
   # Delete older nightly build releases
   - provider: script
     script: python3 .travis/manage_daily_builds.py
