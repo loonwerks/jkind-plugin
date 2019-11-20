@@ -1,4 +1,4 @@
-# Z3-Plugin
+# JKind-Plugin
 
 Packages the JKind model checker into an Eclipse Plugin for convenient
 use in Eclipse-based analysis tools.
