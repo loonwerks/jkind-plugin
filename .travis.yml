@@ -1,6 +1,8 @@
 sudo: false
 dist: xenial
 lang: java
+jdk:
+  - openjdk8
 
 env:
   global:
