@@ -1,0 +1,49 @@
+sudo: false
+dist: xenial
+lang: java
+
+env:
+  global:
+    secure: VArEm99oO4wZ34Nnb6hMbB1x1r3r9ou9wL/etYPyDk6ywW6cZQLcyoo40YQxBih4ht7p/P5RQMs0XM2LX5LWSZ7NASjbRhUX0bthc0wGI4lDlFGXYCeq25nuqWj45MbakC3FVMUV1bkcwiGJ/trQIOyqQkdeoTSeXtIK9M3BAp9lAL1biXqBiAIRQzYbtIjD2fV1o9oNqXptpCX4hlYUhC1+g5dejF3Q89X5o9qihGiD0cY3+u9SEWK0O6y/REN14MsBj2I6WLeAuMWvd5J2fxp/BNiMdYLdsvt9pJWpvWdPd75PoDT3ACd+oRk//UaL3d2rKS2vsV4DY0P0bOriGdUacyS+C9/Cz8tLPWvY032e0j3svQ2EyAZJIpX+2on3TxvH+KRO7TvRaoljoHIOs3BjUPLnv59iXnMs54r12jQokbmMCcBvAqV2b5TEJWOuUcotm0NHUne1UCHjyhQOagtQszkRQqTljub+RaXa+f5zWTkelfkhK9ZQM6nmgP8ToKu9T7DCy8oz1EkmG2J/0bm8pW+GKnu6Cp6MjqpDPUIibevqJEvpOpHlutnmvgtXtLzMENz+GK+cSSI/s1Gq1rwSm9JwCMisrIR+50iniLc7DeXUT5vlu6annmo0tOgDfaKb51HMJjoA+n0ljhZB2hbTVeoS1n3Z5djRPRVtfNk=
+
+addons:
+  apt:
+    packages:
+    - python3
+    - python3-pip
+    - maven
+    - gradle
+
+before_install:
+- pip3 install --user --upgrade setuptools
+- pip3 install --user GitPython github3.py Mako
+- "./git-setup.sh"
+
+script:
+- python3 jkind_fetcher.py -v -i [Vv]\(\\d+\\.\\d+\\.\\d+\) -e [Vv]\([123]\\.\\d+\\.\\d+\)
+
+before_deploy:
+  - export RELEASE_PKG_FILE=$(ls plugin/com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
+  - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+
+deploy:
+  provider: releases
+    api-key: $GH_TOKEN
+    file: 
+      - "${RELEASE_PKG_FILE}"
+    name: Nightly development build ($SNAPSHOT_NUMBER)
+    body: Automated integration build of JKind API plugin $TRAVIS_BRANCH ($TRAVIS_COMMIT) built
+      by Travis CI on $(date +'%F %T %Z').
+    prerelease: true
+    overwrite: false
+    skip_cleanup: true
+    target_commitish: $TRAVIS_COMMIT
+    on:
+      branch: master
+      condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
+  # Delete older nightly build releases
+  - provider: script
+    script: python3 .travis/manage_daily_builds.py
+    on:
+      branch: master
+      condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
