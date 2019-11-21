@@ -257,6 +257,7 @@ def package_plugin(jkind_tag, jkind_version, bundle_version, is_snapshot_version
         if os.path.exists('jkind'):
             shutil.rmtree('jkind')
         jkind_url = '/'.join([GITHUB_URL, JKIND_CHECKER_OWNER, JKIND_CHECKER_REPO + '.git'])
+        jkind_branch = jkind_tag if not is_snapshot_version else 'master'
         clone_result = subprocess.run(['git', 'clone', '-b', jkind_tag, jkind_url, 'jkind'], stderr=subprocess.STDOUT)
         print(clone_result.stdout, file=sys.stderr)
         if (clone_result.returncode != 0):
@@ -331,13 +332,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]")
-        parser.add_argument("-i", "--include", dest="include", help="only include releasess matching this regex pattern. Note: exclude is given preference over include. [default: %(default)s]", metavar="RE" )
-        parser.add_argument("-e", "--exclude", dest="exclude", help="exclude paths matching this regex pattern. [default: %(default)s]", metavar="RE" )
-        parser.add_argument("-s", "--snapshot", dest="snapshot", action="count", help="should a snapshot be generated [default: %(default)s]")
+        parser.add_argument("-i", "--include", dest="include", help="include only releasess matching this regex pattern. Note: exclude is given preference over include. Invalid with -s. [default: %(default)s]", metavar="RE" )
+        parser.add_argument("-e", "--exclude", dest="exclude", help="exclude paths matching this regex pattern. Invalid with -s. [default: %(default)s]", metavar="RE" )
+        parser.add_argument("-s", "--snapshot", dest="snapshot", action="count", help="should a snapshot be generated. Invalid with -e or -i. [default: %(default)s]")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
 
         # Process arguments
         args = parser.parse_args()
+
+        if args.snapshot and (args.include is not None or args.exclude is not None):
+            parser.error("-e or -i must not be used with -s.")
 
         verbose = args.verbose
         inpattern = args.include
@@ -388,6 +392,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         build_order = sorted(plugin_versions.keys())
         print('Building plugin versions: %s' % (pformat(build_order)))
+
+        if is_snapshot_version:
+            build_order = build_order[-1:]
 
         for ver in build_order:
             jkind_tag = plugin_versions[ver]
