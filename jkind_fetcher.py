@@ -258,7 +258,7 @@ def package_plugin(jkind_tag, jkind_version, bundle_version, is_snapshot_version
             shutil.rmtree('jkind')
         jkind_url = '/'.join([GITHUB_URL, JKIND_CHECKER_OWNER, JKIND_CHECKER_REPO + '.git'])
         jkind_branch = jkind_tag if not is_snapshot_version else 'master'
-        clone_result = subprocess.run(['git', 'clone', '-b', jkind_tag, jkind_url, 'jkind'], stderr=subprocess.STDOUT)
+        clone_result = subprocess.run(['git', 'clone', '-b', jkind_branch, jkind_url, 'jkind'], stderr=subprocess.STDOUT)
         print(clone_result.stdout, file=sys.stderr)
         if (clone_result.returncode != 0):
             sys.exit(clone_result.returncode)
