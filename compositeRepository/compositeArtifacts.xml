@@ -3,9 +3,10 @@
 <repository name='&quot;Eclipse Project Test Site&quot;'
     type='org.eclipse.equinox.internal.p2.artifact.repository.CompositeArtifactRepository' version='1.0.0'>
   <properties size='1'>
-    <property name='p2.timestamp' value='1574449190826'/>
+    <property name='p2.timestamp' value='1574449659087'/>
   </properties>
-  <children size='1'>
+  <children size='2'>
+    <child location='com.collins.trustedsystems.jkindapi_4.1.0'/>
     <child location='com.collins.trustedsystems.jkindapi_4.0.1'/>
   </children>
 </repository>

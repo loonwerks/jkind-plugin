@@ -5,10 +5,10 @@
   <parent>
     <groupId>com.collins.trustedsystems.jkind</groupId>
     <artifactId>com.collins.trustedsystems.jkindapi.parent</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
   </parent>
   <artifactId>com.collins.trustedsystems.jkindapi.feature</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
   <packaging>eclipse-feature</packaging>
   
 	<build>
