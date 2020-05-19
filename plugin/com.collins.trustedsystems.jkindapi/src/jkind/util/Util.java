@@ -127,9 +127,9 @@ public class Util {
 	public static Value parseValue(String type, String value) {
 		switch (type) {
 		case "bool":
-			if (value.equals("0") || value.equals("false")) {
+			if (value.equals("0") || value.equals("false") || value.equals("False")) {
 				return BooleanValue.FALSE;
-			} else if (value.equals("1") || value.equals("true")) {
+			} else if (value.equals("1") || value.equals("true") || value.equals("True")) {
 				return BooleanValue.TRUE;
 			}
 			break;
