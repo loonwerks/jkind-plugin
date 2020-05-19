@@ -187,7 +187,7 @@ public class XmlParseThread extends Thread {
 		Set<List<String>> invarantSets = new HashSet<List<String>>();
 		Set<List<String>> ivcSets = new HashSet<List<String>>();
 		List<String> conflicts = getConflicts(getElement(propertyElement, "Conflicts"));
-		Counterexample cex = getCounterexample(getElement(propertyElement, "Counterexample"), k);
+		Counterexample cex = getCounterexample(getElement(propertyElement, getCounterexampleTag()), k);
 
 		if (numOfIVCs == 0) {
 			List<String> curInvariants = getStringList(getElements(propertyElement, "Invariant"));
@@ -313,11 +313,24 @@ public class XmlParseThread extends Thread {
 		return cex;
 	}
 
+	protected String getCounterexampleTag() {
+		switch (backend) {
+		case JKIND:
+			return "Counterexample";
+		case KIND2:
+		case SALLY:
+			return "CounterExample";
+		default:
+			throw new IllegalArgumentException();
+		}		
+	}
+	
 	protected String getSignalTag() {
 		switch (backend) {
 		case JKIND:
 			return "Signal";
 		case KIND2:
+		case SALLY:
 			return "Stream";
 		default:
 			throw new IllegalArgumentException();
@@ -334,16 +347,29 @@ public class XmlParseThread extends Thread {
 		Signal<Value> signal = new Signal<>(name);
 		for (Element valueElement : getElements(signalElement, "Value")) {
 			int time = Integer.parseInt(valueElement.getAttribute(getTimeAttribute()));
-			signal.putValue(time, getValue(valueElement, type));
+			signal.putValue(getTime(time), getValue(valueElement, type));
 		}
 		return signal;
 	}
 
+	protected int getTime(int parsed) {
+		switch (backend) {
+		case JKIND:
+			return parsed;
+		case KIND2:
+		case SALLY:
+			return parsed - 1;
+		default:
+			throw new IllegalArgumentException();
+		}		
+	}
+	
 	protected String getTimeAttribute() {
 		switch (backend) {
 		case JKIND:
 			return "time";
 		case KIND2:
+		case SALLY:
 			return "instant";
 		default:
 			throw new IllegalArgumentException();
