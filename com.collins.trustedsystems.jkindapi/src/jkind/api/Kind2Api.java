@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * The primary interface to Kind2.
  */
 public class Kind2Api extends KindApi {
-	public static final String KIND2 = "kind2-arrays";
+	public static final String KIND2 = "kind2";
 	private static final long POLL_INTERVAL = 100;
 
 	/**
@@ -96,7 +96,8 @@ public class Kind2Api extends KindApi {
 			}
 			monitor.done();
 
-			if (code != 0 && !monitor.isCanceled()) {
+			if (code != 10 && !monitor.isCanceled()) {
+				
 				throw new JKindException("Abnormal termination, exit code " + code);
 			}
 		}

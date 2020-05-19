@@ -355,8 +355,9 @@ public class XmlParseThread extends Thread {
 	protected int getTime(int parsed) {
 		switch (backend) {
 		case JKIND:
-			return parsed;
 		case KIND2:
+			return parsed;
+
 		case SALLY:
 			return parsed - 1;
 		default:
