@@ -70,33 +70,27 @@ public class XmlParseThread extends Thread {
 			String line;
 			String analysis = null;
 			while ((line = lines.readLine()) != null) {
-				boolean beginProperty = line.contains("<Property");
+				boolean beginProperty = line.contains("<Property ");
 				boolean endProperty = line.contains("</Property>");
-				boolean beginProgress = line.contains("<Progress");
+				boolean beginProgress = line.contains("<Progress ");
 				boolean endProgress = line.contains("</Progress>");
 				boolean beginAnalysis = line.contains("<AnalysisStart");
 				boolean endAnalysis = line.contains("<AnalysisStop");
 
-				if(endProperty) {
-					System.out.println("End property is true");
-				}
-				
 				if (beginProgress && endProgress) {
 					// Kind 2 progress format uses a single line
 					parseKind2ProgressXml(line, analysis);
-				} else if (beginProgress) {
+				} else if (beginProgress || beginProperty) {
 					buffer = new StringBuilder();
 					buffer.append(line);
-				} else if (endProperty) {
-					if(beginProperty) {
-						buffer = new StringBuilder();
+					if (endProperty) {
+						parsePropertyXML(buffer.toString(), analysis);
+						buffer = null;
 					}
+				} else if (endProperty) {
 					buffer.append(line);
 					parsePropertyXML(buffer.toString(), analysis);
 					buffer = null;
-				} else if (beginProperty) {
-					buffer = new StringBuilder();
-					buffer.append(line);
 				} else if (endProgress) {
 					buffer.append(line);
 					parseJKindProgressXml(buffer.toString());
