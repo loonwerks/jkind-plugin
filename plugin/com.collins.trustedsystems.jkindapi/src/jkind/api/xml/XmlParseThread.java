@@ -87,18 +87,16 @@ public class XmlParseThread extends Thread {
 				} else if (beginProgress) {
 					buffer = new StringBuilder();
 					buffer.append(line);
-				} else if (beginProperty && endProperty) {
-					buffer = new StringBuilder();
-					buffer.append(line);
-					parsePropertyXML(buffer.toString(), analysis);
-					buffer = null;
-				} else if (beginProperty) { 
-					buffer = new StringBuilder();
-					buffer.append(line);
 				} else if (endProperty) {
+					if(beginProperty) {
+						buffer = new StringBuilder();
+					}
 					buffer.append(line);
 					parsePropertyXML(buffer.toString(), analysis);
 					buffer = null;
+				} else if (beginProperty) {
+					buffer = new StringBuilder();
+					buffer.append(line);
 				} else if (endProgress) {
 					buffer.append(line);
 					parseJKindProgressXml(buffer.toString());
