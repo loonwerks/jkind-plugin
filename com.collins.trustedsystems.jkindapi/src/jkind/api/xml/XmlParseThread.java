@@ -5,10 +5,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,7 +60,7 @@ public class XmlParseThread extends Thread {
 		 * the XML file which causes the buffer to fill. Instead, we read the
 		 * XML file ourselves and give relevant pieces of it to the parser as
 		 * they are ready.
-		 *
+		 * 
 		 * The downside is we assume the <Property ...> and </Property> tags are
 		 * on their own lines.
 		 */
@@ -72,22 +70,34 @@ public class XmlParseThread extends Thread {
 			String line;
 			String analysis = null;
 			while ((line = lines.readLine()) != null) {
-				boolean beginProperty = line.contains("<Property ");
+				boolean beginProperty = line.contains("<Property");
 				boolean endProperty = line.contains("</Property>");
-				boolean beginProgress = line.contains("<Progress ");
+				boolean beginProgress = line.contains("<Progress");
 				boolean endProgress = line.contains("</Progress>");
 				boolean beginAnalysis = line.contains("<AnalysisStart");
 				boolean endAnalysis = line.contains("<AnalysisStop");
 
+				if(endProperty) {
+					System.out.println("End property is true");
+				}
+				
 				if (beginProgress && endProgress) {
 					// Kind 2 progress format uses a single line
 					parseKind2ProgressXml(line, analysis);
-				} else if (beginProgress || beginProperty) {
+				} else if (beginProgress) {
+					buffer = new StringBuilder();
+					buffer.append(line);
+				} else if (beginProperty && endProperty) {
+					buffer = new StringBuilder();
+					buffer.append(line);
+					parsePropertyXML(buffer.toString(), analysis);
+					buffer = null;
+				} else if (beginProperty) { 
 					buffer = new StringBuilder();
 					buffer.append(line);
 				} else if (endProperty) {
 					buffer.append(line);
-					parsePropetyXml(buffer.toString(), analysis);
+					parsePropertyXML(buffer.toString(), analysis);
 					buffer = null;
 				} else if (endProgress) {
 					buffer.append(line);
@@ -149,7 +159,7 @@ public class XmlParseThread extends Thread {
 		}
 	}
 
-	public void parsePropetyXml(String propertyXml, String analysis) {
+	public void parsePropertyXML(String propertyXml, String analysis) {
 		Property prop = getProperty(parseXml(propertyXml));
 		String propName = prop.getName();
 		PropertyResult pr = getOrAddProperty(analysis, propName);
@@ -177,37 +187,18 @@ public class XmlParseThread extends Thread {
 		String name = propertyElement.getAttribute("name");
 		double runtime = getRuntime(getElement(propertyElement, "Runtime"));
 		int trueFor = getTrueFor(getElement(propertyElement, "TrueFor"));
-		int k = getK(getElement(propertyElement, "K"));
+		Integer k = getK(getElement(propertyElement, "K"));
 		String answer = getAnswer(getElement(propertyElement, "Answer"));
 		String source = getSource(getElement(propertyElement, "Answer"));
-		int numOfIVCs = getNumOfIVCs(getElement(propertyElement, "NumberOfIVCs"));
-		boolean mivcTimedOut = getTimedOutInfo(getElement(propertyElement, "TimedoutLoop"));
 		List<String> invariants = getStringList(getElements(propertyElement, "Invariant"));
 		List<String> ivc = getStringList(getElements(propertyElement, "Ivc"));
-		Set<List<String>> invarantSets = new HashSet<List<String>>();
-		Set<List<String>> ivcSets = new HashSet<List<String>>();
 		List<String> conflicts = getConflicts(getElement(propertyElement, "Conflicts"));
 		Counterexample cex = getCounterexample(getElement(propertyElement, getCounterexampleTag()), k);
-
-		if (numOfIVCs == 0) {
-			List<String> curInvariants = getStringList(getElements(propertyElement, "Invariant"));
-			List<String> curIvc = getStringList(getElements(propertyElement, "Ivc"));
-			invarantSets.add(curInvariants);
-			ivcSets.add(curIvc);
-		} else {
-			for (int i = 0; i < numOfIVCs; i++) {
-				Element ivcSetElem = (Element) propertyElement.getElementsByTagName("IvcSet").item(i);
-
-				List<String> curInvariants = getStringList(getElements(ivcSetElem, "Invariant"));
-				List<String> curIvc = getStringList(getElements(ivcSetElem, "Ivc"));
-				invarantSets.add(curInvariants);
-				ivcSets.add(curIvc);
-			}
-		}
-
+		
 		switch (answer) {
 		case "valid":
-			return new ValidProperty(name, source, k, runtime, invariants, ivc, invarantSets, ivcSets, mivcTimedOut);
+			//update this when K is available from Sally
+			return new ValidProperty(name, source, (k == null ? 0 : k), runtime, invariants, ivc);
 
 		case "falsifiable":
 			return new InvalidProperty(name, source, cex, conflicts, runtime);
@@ -237,9 +228,9 @@ public class XmlParseThread extends Thread {
 		return Integer.parseInt(trueForNode.getTextContent());
 	}
 
-	private int getK(Node kNode) {
+	private Integer getK(Node kNode) {
 		if (kNode == null) {
-			return 0;
+			return null;
 		}
 		int k = Integer.parseInt(kNode.getTextContent());
 
@@ -247,27 +238,11 @@ public class XmlParseThread extends Thread {
 		case JKIND:
 			return k;
 		case KIND2:
+		case SALLY:
 			return k + 1;
 		default:
 			throw new IllegalArgumentException();
 		}
-	}
-
-	private int getNumOfIVCs(Node numOfIVCNode) {
-		if (numOfIVCNode == null) {
-			return 0;
-		}
-		int num = Integer.parseInt(numOfIVCNode.getTextContent());
-		return num;
-
-	}
-
-	private boolean getTimedOutInfo(Node timedOutLoopNode) {
-		if (timedOutLoopNode == null) {
-			return false;
-		}
-		String timedOutInfo = timedOutLoopNode.getTextContent();
-		return timedOutInfo.equals("yes");
 	}
 
 	private String getAnswer(Node answerNode) {
@@ -298,13 +273,27 @@ public class XmlParseThread extends Thread {
 		return conflicts;
 	}
 
-	private Counterexample getCounterexample(Element cexElement, int k) {
+	private Counterexample getCounterexample(Element cexElement, Integer k) {
 		if (cexElement == null) {
 			return null;
 		}
-
+		
+		//you can inline this once the hack below is removed.
+		List<Element> signalElements = getElements(cexElement, getSignalTag());
+		
+		//this is a hack to deal with Sally's missing K value
+		if (k == null) {
+			Signal<Value> x = getSignal(signalElements.get(0));
+			
+			Integer length = -1;
+			for(Integer iv : x.getValues().keySet()) {
+				length = iv > length ? iv : length;
+			}
+			k = length+1;
+		}
+		
 		Counterexample cex = new Counterexample(k);
-		for (Element signalElement : getElements(cexElement, getSignalTag())) {
+		for (Element signalElement : signalElements) {
 			cex.addSignal(getSignal(signalElement));
 		}
 		for (Element functionElement : getElements(cexElement, "Function")) {
@@ -347,22 +336,9 @@ public class XmlParseThread extends Thread {
 		Signal<Value> signal = new Signal<>(name);
 		for (Element valueElement : getElements(signalElement, "Value")) {
 			int time = Integer.parseInt(valueElement.getAttribute(getTimeAttribute()));
-			signal.putValue(getTime(time), getValue(valueElement, type));
+			signal.putValue(time, getValue(valueElement, type));
 		}
 		return signal;
-	}
-
-	protected int getTime(int parsed) {
-		switch (backend) {
-		case JKIND:
-		case KIND2:
-			return parsed;
-
-		case SALLY:
-			return parsed - 1;
-		default:
-			throw new IllegalArgumentException();
-		}		
 	}
 	
 	protected String getTimeAttribute() {
@@ -394,7 +370,7 @@ public class XmlParseThread extends Thread {
 		}
 		VarDecl output = getVarDecl(getElement(functionElement, "Output"));
 		FunctionTable table = new FunctionTable(name, inputs, output);
-
+		
 		for (Element fvElement : getElements(functionElement, "FunctionValue")) {
 			List<Value> inputValues = new ArrayList<>();
 			List<Element> ivElements = getElements(fvElement, "InputValue");
