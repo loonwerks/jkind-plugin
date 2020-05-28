@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
@@ -138,6 +139,14 @@ public class Util {
 			return new IntegerValue(new BigInteger(value));
 
 		case "real":
+			
+			//Sally returns real values with decimal points
+			//Question: how to manage precision loss?
+			if(value.contains(".")) {
+				double x = Double.parseDouble(value.toString());
+				return new RealValue(BigFraction.valueOf(BigDecimal.valueOf(x)));
+			}
+			
 			String[] strs = value.split("/");
 			if (strs.length <= 2) {
 				BigInteger num = new BigInteger(strs[0]);
