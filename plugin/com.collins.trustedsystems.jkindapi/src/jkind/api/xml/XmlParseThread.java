@@ -179,7 +179,7 @@ public class XmlParseThread extends Thread {
 		String name = propertyElement.getAttribute("name");
 		double runtime = getRuntime(getElement(propertyElement, "Runtime"));
 		int trueFor = getTrueFor(getElement(propertyElement, "TrueFor"));
-		Integer k = getK(getElement(propertyElement, "K"));
+		int k = getK(getElement(propertyElement, "K"));
 		String answer = getAnswer(getElement(propertyElement, "Answer"));
 		String source = getSource(getElement(propertyElement, "Answer"));
 		List<String> invariants = getStringList(getElements(propertyElement, "Invariant"));
@@ -190,7 +190,7 @@ public class XmlParseThread extends Thread {
 		switch (answer) {
 		case "valid":
 			//update this when K is available from Sally
-			return new ValidProperty(name, source, (k == null ? 0 : k), runtime, invariants, ivc);
+			return new ValidProperty(name, source, k, runtime, invariants, ivc);
 
 		case "falsifiable":
 			return new InvalidProperty(name, source, cex, conflicts, runtime);
@@ -220,17 +220,17 @@ public class XmlParseThread extends Thread {
 		return Integer.parseInt(trueForNode.getTextContent());
 	}
 
-	private Integer getK(Node kNode) {
+	private int getK(Node kNode) {
 		if (kNode == null) {
-			return null;
+			return 0;
 		}
 		int k = Integer.parseInt(kNode.getTextContent());
 
 		switch (backend) {
 		case JKIND:
+		case SALLY:
 			return k;
 		case KIND2:
-		case SALLY:
 			return k + 1;
 		default:
 			throw new IllegalArgumentException();
@@ -271,21 +271,21 @@ public class XmlParseThread extends Thread {
 		}
 		
 		//you can inline this once the hack below is removed.
-		List<Element> signalElements = getElements(cexElement, getSignalTag());
+		
 		
 		//this is a hack to deal with Sally's missing K value
-		if (k == null) {
-			Signal<Value> x = getSignal(signalElements.get(0));
-			
-			Integer length = -1;
-			for(Integer iv : x.getValues().keySet()) {
-				length = iv > length ? iv : length;
-			}
-			k = length+1;
-		}
+//		if (k == null) {
+//			Signal<Value> x = getSignal(signalElements.get(0));
+//			
+//			Integer length = -1;
+//			for(Integer iv : x.getValues().keySet()) {
+//				length = iv > length ? iv : length;
+//			}
+//			k = length+1;
+//		}
 		
 		Counterexample cex = new Counterexample(k);
-		for (Element signalElement : signalElements) {
+		for (Element signalElement : getElements(cexElement, getSignalTag())) {
 			cex.addSignal(getSignal(signalElement));
 		}
 		for (Element functionElement : getElements(cexElement, "Function")) {
