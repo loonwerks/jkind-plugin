@@ -176,6 +176,7 @@ public class XmlParseThread extends Thread {
 	}
 
 	private Property getProperty(Element propertyElement) {
+		String reportFile = getReportFile(propertyElement);
 		String name = propertyElement.getAttribute("name");
 		double runtime = getRuntime(getElement(propertyElement, "Runtime"));
 		int trueFor = getTrueFor(getElement(propertyElement, "TrueFor"));
@@ -189,11 +190,10 @@ public class XmlParseThread extends Thread {
 		
 		switch (answer) {
 		case "valid":
-			//update this when K is available from Sally
 			return new ValidProperty(name, source, k, runtime, invariants, ivc);
 
 		case "falsifiable":
-			return new InvalidProperty(name, source, cex, conflicts, runtime);
+			return new InvalidProperty(name, source, cex, conflicts, runtime, reportFile);
 
 		case "unknown":
 			return new UnknownProperty(name, trueFor, cex, runtime);
@@ -203,6 +203,15 @@ public class XmlParseThread extends Thread {
 
 		default:
 			throw new JKindException("Unknown property answer in XML file: " + answer);
+		}
+	}
+
+	private String getReportFile(Element propertyElement) {
+		switch(backend) {
+			case SALLY:
+				return propertyElement.getAttribute("report");
+			default:
+				return null;
 		}
 	}
 
@@ -269,20 +278,6 @@ public class XmlParseThread extends Thread {
 		if (cexElement == null) {
 			return null;
 		}
-		
-		//you can inline this once the hack below is removed.
-		
-		
-		//this is a hack to deal with Sally's missing K value
-//		if (k == null) {
-//			Signal<Value> x = getSignal(signalElements.get(0));
-//			
-//			Integer length = -1;
-//			for(Integer iv : x.getValues().keySet()) {
-//				length = iv > length ? iv : length;
-//			}
-//			k = length+1;
-//		}
 		
 		Counterexample cex = new Counterexample(k);
 		for (Element signalElement : getElements(cexElement, getSignalTag())) {
