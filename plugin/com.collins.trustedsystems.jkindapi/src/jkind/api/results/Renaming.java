@@ -23,7 +23,7 @@ import jkind.results.ValidProperty;
 
 /**
  * A class for renaming and removing variables from analysis results
- * 
+ *
  * @see MapRenaming
  */
 public abstract class Renaming {
@@ -31,7 +31,7 @@ public abstract class Renaming {
 	 * Returns the new name for a given name, or null if the original name
 	 * should be hidden. This method should always return the same result when
 	 * given the same input.
-	 * 
+	 *
 	 * @param original
 	 *            Original variable name
 	 * @return the new variable name or null if variable should be hidden
@@ -40,7 +40,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename property and signals (if present), possibly omitting some
-	 * 
+	 *
 	 * @param property
 	 *            Property to be renamed
 	 * @return Renamed version of the property, or <code>null</code> if there is
@@ -62,9 +62,9 @@ public abstract class Renaming {
 
 	/**
 	 * Rename valid property and signals (if present), possibly omitting some
-	 * 
+	 *
 	 * Note: Invariants (if present) will not be renamed
-	 * 
+	 *
 	 * @param property
 	 *            Property to be renamed
 	 * @return Renamed version of the property, or <code>null</code> if there is
@@ -82,7 +82,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename invalid property and signals (if present), possibly omitting some
-	 * 
+	 *
 	 * @param property
 	 *            Property to be renamed
 	 * @return Renamed version of the property, or <code>null</code> if there is
@@ -95,12 +95,12 @@ public abstract class Renaming {
 		}
 
 		return new InvalidProperty(name, property.getSource(), rename(property.getCounterexample()),
-				rename(this::rename, property.getConflicts()), property.getRuntime());
+				rename(this::rename, property.getConflicts()), property.getRuntime(), property.getReport());
 	}
 
 	/**
 	 * Rename unknown property and signals (if present), possibly omitting some
-	 * 
+	 *
 	 * @param property
 	 *            Property to be renamed
 	 * @return Renamed version of the property, or <code>null</code> if there is
@@ -118,7 +118,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename inconsistent property
-	 * 
+	 *
 	 * @param property
 	 *            Property to be renamed
 	 * @return Renamed version of the property, or <code>null</code> if there is
@@ -135,7 +135,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename signals in a counterexample, possibly omitting some
-	 * 
+	 *
 	 * @param cex
 	 *            Counterexample to be renamed
 	 * @return Renamed version of the counterexample
@@ -215,9 +215,9 @@ public abstract class Renaming {
 
 	/**
 	 * Rename signal
-	 * 
+	 *
 	 * @param <T>
-	 * 
+	 *
 	 * @param signal
 	 *            The signal to be renamed
 	 * @return Renamed version of the signal or <code>null</code> if there is no
@@ -239,7 +239,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename a collection of elements, possibly omitting some
-	 * 
+	 *
 	 * @param es
 	 *            Strings to be renamed
 	 * @return Renamed version of the conflicts
@@ -250,7 +250,7 @@ public abstract class Renaming {
 
 	/**
 	 * Rename an IVC variable
-	 * 
+	 *
 	 * @param ivc
 	 *            the string to be renamed
 	 * @return Renamed version of the ivc string

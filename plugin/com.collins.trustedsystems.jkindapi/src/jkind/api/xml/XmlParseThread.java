@@ -60,7 +60,7 @@ public class XmlParseThread extends Thread {
 		 * the XML file which causes the buffer to fill. Instead, we read the
 		 * XML file ourselves and give relevant pieces of it to the parser as
 		 * they are ready.
-		 * 
+		 *
 		 * The downside is we assume the <Property ...> and </Property> tags are
 		 * on their own lines.
 		 */
@@ -176,7 +176,6 @@ public class XmlParseThread extends Thread {
 	}
 
 	private Property getProperty(Element propertyElement) {
-		String reportFile = getReportFile(propertyElement);
 		String name = propertyElement.getAttribute("name");
 		double runtime = getRuntime(getElement(propertyElement, "Runtime"));
 		int trueFor = getTrueFor(getElement(propertyElement, "TrueFor"));
@@ -187,7 +186,8 @@ public class XmlParseThread extends Thread {
 		List<String> ivc = getStringList(getElements(propertyElement, "Ivc"));
 		List<String> conflicts = getConflicts(getElement(propertyElement, "Conflicts"));
 		Counterexample cex = getCounterexample(getElement(propertyElement, getCounterexampleTag()), k);
-		
+		String reportFile = getReportFile(propertyElement);
+
 		switch (answer) {
 		case "valid":
 			return new ValidProperty(name, source, k, runtime, invariants, ivc);
@@ -278,7 +278,7 @@ public class XmlParseThread extends Thread {
 		if (cexElement == null) {
 			return null;
 		}
-		
+
 		Counterexample cex = new Counterexample(k);
 		for (Element signalElement : getElements(cexElement, getSignalTag())) {
 			cex.addSignal(getSignal(signalElement));
@@ -298,9 +298,9 @@ public class XmlParseThread extends Thread {
 			return "CounterExample";
 		default:
 			throw new IllegalArgumentException();
-		}		
+		}
 	}
-	
+
 	protected String getSignalTag() {
 		switch (backend) {
 		case JKIND:
@@ -327,7 +327,7 @@ public class XmlParseThread extends Thread {
 		}
 		return signal;
 	}
-	
+
 	protected String getTimeAttribute() {
 		switch (backend) {
 		case JKIND:
@@ -357,7 +357,7 @@ public class XmlParseThread extends Thread {
 		}
 		VarDecl output = getVarDecl(getElement(functionElement, "Output"));
 		FunctionTable table = new FunctionTable(name, inputs, output);
-		
+
 		for (Element fvElement : getElements(functionElement, "FunctionValue")) {
 			List<Value> inputValues = new ArrayList<>();
 			List<Element> ivElements = getElements(fvElement, "InputValue");
