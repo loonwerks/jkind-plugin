@@ -99,7 +99,7 @@ public abstract class Renaming {
 		}
 
 		return new InvalidProperty(name, property.getSource(), rename(property.getCounterexample()),
-				rename(this::rename, property.getConflicts()), property.getRuntime());
+				rename(this::rename, property.getConflicts()), property.getRuntime(), property.getReport());
 	}
 
 	/**
