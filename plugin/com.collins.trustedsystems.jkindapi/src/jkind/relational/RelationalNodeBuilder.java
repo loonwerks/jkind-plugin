@@ -1,8 +1,15 @@
 package jkind.relational;
 
 import static jkind.lustre.LustreUtil.and;
+import static jkind.lustre.LustreUtil.arrow;
+import static jkind.lustre.LustreUtil.eq;
+import static jkind.lustre.LustreUtil.equal;
 import static jkind.lustre.LustreUtil.id;
 import static jkind.lustre.LustreUtil.implies;
+import static jkind.lustre.LustreUtil.integer;
+import static jkind.lustre.LustreUtil.not;
+import static jkind.lustre.LustreUtil.plus;
+import static jkind.lustre.LustreUtil.pre;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,34 +18,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jkind.lustre.Constant;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
-import jkind.lustre.Function;
 import jkind.lustre.IdExpr;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.NodeCallExpr;
-import jkind.lustre.Program;
 import jkind.lustre.Type;
-import jkind.lustre.TypeDef;
 import jkind.lustre.VarDecl;
 import jkind.lustre.builders.EquationBuilder;
 import jkind.lustre.builders.NodeBuilder;
-import jkind.lustre.builders.ProgramBuilder;
 
 public class RelationalNodeBuilder {
 
 	private String id;
 	
 	public Set<String> namespace = new HashSet<>();
-	
-	private Map<String,Node> support = new LinkedHashMap<>();
-	private Map<String,Node> called = new LinkedHashMap<>();
-	
-	private Map<String,Constant> constants = new LinkedHashMap<>();
-	private Map<String,TypeDef> typedefs = new LinkedHashMap<>();
-	private Map<String,Function> functions = new LinkedHashMap<>();
 	
 	private Map<String,VarDecl> inputs = new LinkedHashMap<>();
 	private Map<String,VarDecl> outputs = new LinkedHashMap<>();
@@ -58,41 +53,11 @@ public class RelationalNodeBuilder {
 		}		
 	}
 	
-	public RelationalNodeBuilder addSupportNode(Node node) {
-		checkNamespace(node.id);
-		namespace.add(node.id);
-		support.put(node.id, node);
-		return this;
-	}
-	
-	public RelationalNodeBuilder addCalledNode(Node node) {
-		checkNamespace(node.id);
-		namespace.add(node.id);
-		called.put(node.id, node);
-		return this;
-	}
-	
-	public IdExpr createConstant(String name, Type t, Expr e) {
-		checkNamespace(name);
-		Constant c = new Constant(name,t,e);
-		namespace.add(name);
-		constants.put(name, c);
-		return new IdExpr(name);
-	}
-	
-	public NamedType createTypeDefinition(String name, Type t) {
-		checkNamespace(name);
-		TypeDef td = new TypeDef(name,t);
-		namespace.add(name);
-		typedefs.put(name, td);
-		return new NamedType(name);
-	}
-	
-	public RelationalNodeBuilder addFunction(Function f) {
-		checkNamespace(f.id);
-		namespace.add(f.id);
-		functions.put(f.id, f);
-		return this;
+	public List<IdExpr> getReturnVariables() {
+		List<IdExpr> idExprs = new ArrayList<>();
+		assumptions.entrySet().forEach(assumption -> idExprs.add(id(assumption.getKey())));
+		constraints.entrySet().forEach(constraint -> idExprs.add(id(constraint.getKey())));
+		return idExprs;
 	}
 	
 	public IdExpr createInput(String name, Type t) {
@@ -197,39 +162,79 @@ public class RelationalNodeBuilder {
 		return eq.build();		
 	}
 	
-	public Program build() {
-
-		ProgramBuilder program = new ProgramBuilder();
+	public NodeCallExpr call(List<Expr> args) {
+		int input_size = inputs.size() + outputs.size() + locals.size();
+		if (args.size() != input_size) {
+			throw new JKindRelationalException(this.id + " expects " + input_size + " arguments, but received " + args.size());
+		}
 		
-		support.entrySet().forEach(node -> program.addNode(node.getValue()));
-		constants.entrySet().forEach(constant -> program.addConstant(constant.getValue()));
-		typedefs.entrySet().forEach(typedef -> program.addType(typedef.getValue()));
-		functions.entrySet().forEach(function -> program.addFunction(function.getValue()));
+		return new NodeCallExpr(this.id, args);
+	}
+	
+	public Node build() {
+		NodeBuilder node = new NodeBuilder(id);
+		inputs.entrySet().forEach(input -> node.addInput(input.getValue()));
+		outputs.entrySet().forEach(output -> node.addInput(output.getValue()));
+		locals.entrySet().forEach(local -> node.addInput(local.getValue()));
 		
-		NodeBuilder main = new NodeBuilder(id);
-		inputs.entrySet().forEach(input -> main.addInput(input.getValue()));
-		outputs.entrySet().forEach(output -> main.addInput(output.getValue()));
-		locals.entrySet().forEach(local -> main.addInput(local.getValue()));
+		assumptions.entrySet().forEach(assumption -> node.createOutput(assumption.getKey(), NamedType.BOOL));
+		assumptions.entrySet().forEach(assumption -> node.addEquation(crunch(assumption.getValue())));
 		
-		assumptions.entrySet().forEach(assumption -> main.createOutput(assumption.getKey(), NamedType.BOOL));
-		assumptions.entrySet().forEach(assumption -> main.addEquation(crunch(assumption.getValue())));
-		assumptions.entrySet().forEach(assumption -> main.addIvc(assumption.getKey()));
+		constraints.entrySet().forEach(relation -> node.createOutput(relation.getKey(), NamedType.BOOL));
+		constraints.entrySet().forEach(relation -> node.addEquation(crunch(relation.getValue())));
 		
-		constraints.entrySet().forEach(relation -> main.createOutput(relation.getKey(), NamedType.BOOL));
-		constraints.entrySet().forEach(relation -> main.addEquation(crunch(relation.getValue())));
-		constraints.entrySet().forEach(relation -> main.addIvc(relation.getKey()));
+		return node.build();
+	}
+	
+	public Node buildEntailment() {
+		NodeBuilder node = new NodeBuilder(this.build());
 		
-		IdExpr conjunct = main.createLocal("conjunct", NamedType.BOOL);
-		main.addEquation(new Equation(conjunct, conjunctAllRelations()));
+		IdExpr conjunct = node.createLocal("conjunct", NamedType.BOOL);
+		node.addEquation(new Equation(conjunct, conjunctAllRelations()));
 		
-		properties.entrySet().forEach(property -> main.createLocal(property.getKey(), NamedType.BOOL));
-		properties.entrySet().forEach(property -> main.addEquation(crunchProperty(conjunct, property.getValue())));
-		properties.entrySet().forEach(property -> main.addProperty(property.getKey()));
+		properties.entrySet().forEach(property -> node.createLocal(property.getKey(), NamedType.BOOL));
+		properties.entrySet().forEach(property -> node.addEquation(crunchProperty(conjunct, property.getValue())));
+		properties.entrySet().forEach(property -> node.addProperty(property.getKey()));
 		
-		Node n = main.build();
-		program.addNode(n);
-		program.setMain(n.id);
+		assumptions.entrySet().forEach(assumption -> node.addIvc(assumption.getKey()));
+		constraints.entrySet().forEach(constraint -> node.addIvc(constraint.getKey()));
 		
-		return program.build();
+		return node.build();
+	}
+	
+	public Node buildConsistency(int N) {
+		NodeBuilder node = new NodeBuilder(this.build());
+		
+		IdExpr conjunct = node.createLocal("conjunct", NamedType.BOOL);
+		node.addEquation(new Equation(conjunct, conjunctAllRelations()));
+		
+		IdExpr step = node.createLocal("step", NamedType.INT);
+		node.addEquation(eq(step, plus(arrow(integer(0),pre(step)),integer(1))));
+		
+		IdExpr consistent = node.createLocal("consistent", NamedType.BOOL);
+		node.addEquation(eq(consistent, not(and(equal(step,integer(N)), conjunct))));
+		node.addProperty(consistent);
+		
+		assumptions.entrySet().forEach(assumption -> node.addIvc(assumption.getKey()));
+		constraints.entrySet().forEach(constraint -> node.addIvc(constraint.getKey()));
+		
+		return node.build();
+	}
+	
+	public Node buildRealizability() {
+		NodeBuilder node = new NodeBuilder(this.build());
+		
+		IdExpr conjunct = node.createLocal("conjunct", NamedType.BOOL);
+		node.addEquation(new Equation(conjunct, conjunctAllRelations()));
+		
+		assumptions.entrySet().forEach(assumption -> node.addAssertion(assumption.getValue().expr));
+		properties.entrySet().forEach(property -> node.createLocal(property.getKey(), NamedType.BOOL));
+		properties.entrySet().forEach(property -> node.addEquation(crunchProperty(conjunct, property.getValue())));
+		
+		List<String> realizabilityInputs = new ArrayList<>();
+		this.inputs.entrySet().forEach(input -> realizabilityInputs.add(input.getKey()));
+		node.setRealizabilityInputs(realizabilityInputs);
+		
+		return node.build();
 	}
 }

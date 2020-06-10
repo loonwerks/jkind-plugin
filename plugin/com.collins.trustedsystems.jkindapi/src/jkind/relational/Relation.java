@@ -14,5 +14,5 @@ public class Relation {
 	private Relation(String id, Expr expr) {
 		this.id = id;
 		this.expr = expr;
-	}
+	}	
 }
