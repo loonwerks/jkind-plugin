@@ -382,7 +382,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         print('JKIND versions after include: %s' % (pformat(jkind_versions)))
 
         # Find the plugin version corresponding to the jkind-version
-        regex = re.compile(r'\d+\.\d+\.\d+')
+        regex = re.compile(r'[Vv]\d+\.\d+\.\d+')
         plugin_versions = {regex.search(x).group(0) : x for x in filter(regex.search, jkind_versions)}
         print('Plugin versions matching JKIND versions: %s' % (pformat(plugin_versions)))
 
