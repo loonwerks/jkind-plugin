@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import jkind.JKindException;
 import jkind.api.results.JKindResult;
@@ -15,13 +12,15 @@ import jkind.api.xml.XmlParseThread;
 import jkind.lustre.Program;
 import jkind.lustre.visitors.Kind2ArraysPrettyPrintVisitor;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * The primary interface to Kind2.
  */
 public class Kind2Api extends KindApi {
-	public static final String KIND2 = "kind2";
+	public static final String KIND2 = "kind2-arrays";
 	private static final long POLL_INTERVAL = 100;
-		
+
 	/**
 	 * Run Kind on a Lustre program
 	 * 
@@ -97,7 +96,7 @@ public class Kind2Api extends KindApi {
 			}
 			monitor.done();
 
-			if (!Set.of(0,10,20).contains(code) && !monitor.isCanceled()) {	
+			if (code != 0 && !monitor.isCanceled()) {
 				throw new JKindException("Abnormal termination, exit code " + code);
 			}
 		}

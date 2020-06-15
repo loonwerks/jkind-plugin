@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
@@ -128,9 +127,9 @@ public class Util {
 	public static Value parseValue(String type, String value) {
 		switch (type) {
 		case "bool":
-			if (value.equals("0") || value.equals("false") || value.equals("False")) {
+			if (value.equals("0") || value.equals("false")) {
 				return BooleanValue.FALSE;
-			} else if (value.equals("1") || value.equals("true") || value.equals("True")) {
+			} else if (value.equals("1") || value.equals("true")) {
 				return BooleanValue.TRUE;
 			}
 			break;
@@ -139,14 +138,6 @@ public class Util {
 			return new IntegerValue(new BigInteger(value));
 
 		case "real":
-			
-			//Sally returns real values with decimal points
-			//Question: how to manage precision loss?
-			if(value.contains(".")) {
-				double x = Double.parseDouble(value.toString());
-				return new RealValue(BigFraction.valueOf(BigDecimal.valueOf(x)));
-			}
-			
 			String[] strs = value.split("/");
 			if (strs.length <= 2) {
 				BigInteger num = new BigInteger(strs[0]);
@@ -303,6 +294,17 @@ public class Util {
 	public static Set<String> safeStringSortedSet(Collection<String> original) {
 		TreeSet<String> set = new TreeSet<>(new StringNaturalOrdering());
 		set.addAll(original);
+		return Collections.unmodifiableSet(set);
+	}
+
+	public static Set<List<String>> safeStringSortedSets(Set<List<String>> original) {
+		Set<List<String>> set = new HashSet<>(new TreeSet<>(new StringNaturalOrdering()));
+		for (Collection<String> currentSetOriginal : original) {
+			TreeSet<String> individualSet = new TreeSet<>(new StringNaturalOrdering());
+			individualSet.addAll(currentSetOriginal);
+			set.add(safeList(individualSet));
+		}
+
 		return Collections.unmodifiableSet(set);
 	}
 

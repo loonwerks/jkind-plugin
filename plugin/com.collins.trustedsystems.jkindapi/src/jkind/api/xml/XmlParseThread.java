@@ -5,8 +5,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -83,13 +85,9 @@ public class XmlParseThread extends Thread {
 				} else if (beginProgress || beginProperty) {
 					buffer = new StringBuilder();
 					buffer.append(line);
-					if (endProperty) {
-						parsePropertyXML(buffer.toString(), analysis);
-						buffer = null;
-					}
 				} else if (endProperty) {
 					buffer.append(line);
-					parsePropertyXML(buffer.toString(), analysis);
+					parsePropetyXml(buffer.toString(), analysis);
 					buffer = null;
 				} else if (endProgress) {
 					buffer.append(line);
@@ -151,7 +149,7 @@ public class XmlParseThread extends Thread {
 		}
 	}
 
-	public void parsePropertyXML(String propertyXml, String analysis) {
+	public void parsePropetyXml(String propertyXml, String analysis) {
 		Property prop = getProperty(parseXml(propertyXml));
 		String propName = prop.getName();
 		PropertyResult pr = getOrAddProperty(analysis, propName);
@@ -182,18 +180,37 @@ public class XmlParseThread extends Thread {
 		int k = getK(getElement(propertyElement, "K"));
 		String answer = getAnswer(getElement(propertyElement, "Answer"));
 		String source = getSource(getElement(propertyElement, "Answer"));
+		int numOfIVCs = getNumOfIVCs(getElement(propertyElement, "NumberOfIVCs"));
+		boolean mivcTimedOut = getTimedOutInfo(getElement(propertyElement, "TimedoutLoop"));
 		List<String> invariants = getStringList(getElements(propertyElement, "Invariant"));
 		List<String> ivc = getStringList(getElements(propertyElement, "Ivc"));
+		Set<List<String>> invarantSets = new HashSet<List<String>>();
+		Set<List<String>> ivcSets = new HashSet<List<String>>();
 		List<String> conflicts = getConflicts(getElement(propertyElement, "Conflicts"));
-		Counterexample cex = getCounterexample(getElement(propertyElement, getCounterexampleTag()), k);
-		String reportFile = getReportFile(propertyElement);
+		Counterexample cex = getCounterexample(getElement(propertyElement, "Counterexample"), k);
+
+		if (numOfIVCs == 0) {
+			List<String> curInvariants = getStringList(getElements(propertyElement, "Invariant"));
+			List<String> curIvc = getStringList(getElements(propertyElement, "Ivc"));
+			invarantSets.add(curInvariants);
+			ivcSets.add(curIvc);
+		} else {
+			for (int i = 0; i < numOfIVCs; i++) {
+				Element ivcSetElem = (Element) propertyElement.getElementsByTagName("IvcSet").item(i);
+
+				List<String> curInvariants = getStringList(getElements(ivcSetElem, "Invariant"));
+				List<String> curIvc = getStringList(getElements(ivcSetElem, "Ivc"));
+				invarantSets.add(curInvariants);
+				ivcSets.add(curIvc);
+			}
+		}
 
 		switch (answer) {
 		case "valid":
-			return new ValidProperty(name, source, k, runtime, invariants, ivc);
+			return new ValidProperty(name, source, k, runtime, invariants, ivc, invarantSets, ivcSets, mivcTimedOut);
 
 		case "falsifiable":
-			return new InvalidProperty(name, source, cex, conflicts, runtime, reportFile);
+			return new InvalidProperty(name, source, cex, conflicts, runtime);
 
 		case "unknown":
 			return new UnknownProperty(name, trueFor, cex, runtime);
@@ -203,15 +220,6 @@ public class XmlParseThread extends Thread {
 
 		default:
 			throw new JKindException("Unknown property answer in XML file: " + answer);
-		}
-	}
-
-	private String getReportFile(Element propertyElement) {
-		switch(backend) {
-			case SALLY:
-				return propertyElement.getAttribute("report");
-			default:
-				return null;
 		}
 	}
 
@@ -237,13 +245,29 @@ public class XmlParseThread extends Thread {
 
 		switch (backend) {
 		case JKIND:
-		case SALLY:
 			return k;
 		case KIND2:
 			return k + 1;
 		default:
 			throw new IllegalArgumentException();
 		}
+	}
+
+	private int getNumOfIVCs(Node numOfIVCNode) {
+		if (numOfIVCNode == null) {
+			return 0;
+		}
+		int num = Integer.parseInt(numOfIVCNode.getTextContent());
+		return num;
+
+	}
+
+	private boolean getTimedOutInfo(Node timedOutLoopNode) {
+		if (timedOutLoopNode == null) {
+			return false;
+		}
+		String timedOutInfo = timedOutLoopNode.getTextContent();
+		return timedOutInfo.equals("yes");
 	}
 
 	private String getAnswer(Node answerNode) {
@@ -274,7 +298,7 @@ public class XmlParseThread extends Thread {
 		return conflicts;
 	}
 
-	private Counterexample getCounterexample(Element cexElement, Integer k) {
+	private Counterexample getCounterexample(Element cexElement, int k) {
 		if (cexElement == null) {
 			return null;
 		}
@@ -289,24 +313,11 @@ public class XmlParseThread extends Thread {
 		return cex;
 	}
 
-	protected String getCounterexampleTag() {
-		switch (backend) {
-		case JKIND:
-			return "Counterexample";
-		case KIND2:
-		case SALLY:
-			return "CounterExample";
-		default:
-			throw new IllegalArgumentException();
-		}
-	}
-
 	protected String getSignalTag() {
 		switch (backend) {
 		case JKIND:
 			return "Signal";
 		case KIND2:
-		case SALLY:
 			return "Stream";
 		default:
 			throw new IllegalArgumentException();
@@ -333,7 +344,6 @@ public class XmlParseThread extends Thread {
 		case JKIND:
 			return "time";
 		case KIND2:
-		case SALLY:
 			return "instant";
 		default:
 			throw new IllegalArgumentException();

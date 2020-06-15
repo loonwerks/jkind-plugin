@@ -2,9 +2,12 @@ package jkind.api.results;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 
 import jkind.JKindException;
@@ -77,7 +80,8 @@ public abstract class Renaming {
 		}
 
 		return new ValidProperty(name, property.getSource(), property.getK(), property.getRuntime(),
-				property.getInvariants(), rename(this::renameIVC, property.getIvc()));
+				property.getInvariants(), rename(this::renameIVC, property.getIvc()), property.getInvariantSets(),
+				rename(this::renameIVC, property.getIvcSets()), property.getMivcTimedOut());
 	}
 
 	/**
@@ -95,7 +99,7 @@ public abstract class Renaming {
 		}
 
 		return new InvalidProperty(name, property.getSource(), rename(property.getCounterexample()),
-				rename(this::rename, property.getConflicts()), property.getRuntime(), property.getReport());
+				rename(this::rename, property.getConflicts()), property.getRuntime());
 	}
 
 	/**
@@ -245,7 +249,43 @@ public abstract class Renaming {
 	 * @return Renamed version of the conflicts
 	 */
 	private List<String> rename(Function<String, String> f, Collection<String> es) {
-		return es.stream().map(f).filter(e -> e != null).collect(toList());
+		List<String> updatedOrigList = new ArrayList<String>();
+		for (String curOrigStr : es) {
+			String updatedName = curOrigStr;
+			if (curOrigStr.contains(".")) {
+				updatedName = updatedNodeElemName(curOrigStr);
+			}
+			updatedOrigList.add(updatedName);
+		}
+		List<String> renamedList = updatedOrigList.stream().map(f).filter(e -> e != null).collect(toList());
+
+		return renamedList;
+	}
+
+	private Set<List<String>> rename(Function<String, String> f, Set<List<String>> es) {
+		Set<List<String>> set = new HashSet<List<String>>();
+		for (List<String> curOrigList : es) {
+			List<String> updatedOrigList = new ArrayList<String>();
+			for (String curOrigStr : curOrigList) {
+				String updatedName = curOrigStr;
+				if (curOrigStr.contains(".")) {
+					updatedName = updatedNodeElemName(curOrigStr);
+				}
+				updatedOrigList.add(updatedName);
+			}
+			List<String> renamedList = updatedOrigList.stream().map(f).filter(e -> e != null).collect(toList());
+			set.add(renamedList);
+		}
+		return set;
+	}
+
+	private String updatedNodeElemName(String curOrigStr) {
+		String updatedName;
+		String nodeName = curOrigStr.substring(0, curOrigStr.lastIndexOf('.'));
+		String elemName = curOrigStr.substring(curOrigStr.lastIndexOf('.'), curOrigStr.length());
+		nodeName = nodeName.replaceAll("~([0-9]+)$", "");
+		updatedName = nodeName + elemName;
+		return updatedName;
 	}
 
 	/**
