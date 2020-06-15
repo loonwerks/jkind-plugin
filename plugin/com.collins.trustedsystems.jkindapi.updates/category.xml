@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <feature id="com.collins.trustedsystems.jkindapi.feature">
-      <category name="jkind"/>
-   </feature>
-   <category-def name="jkind" label="JKind Plug-in (by Collins Aerospace)"/>
-</site>
