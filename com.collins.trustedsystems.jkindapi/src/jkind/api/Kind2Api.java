@@ -3,8 +3,8 @@ package jkind.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -21,10 +21,10 @@ import jkind.lustre.visitors.Kind2ArraysPrettyPrintVisitor;
 public class Kind2Api extends KindApi {
 	public static final String KIND2 = "kind2";
 	private static final long POLL_INTERVAL = 100;
-		
+
 	/**
 	 * Run Kind on a Lustre program
-	 * 
+	 *
 	 * @param program
 	 *            Lustre program
 	 * @param result
@@ -43,7 +43,7 @@ public class Kind2Api extends KindApi {
 
 	/**
 	 * Run Kind2 on a Lustre program
-	 * 
+	 *
 	 * @param lustreFile
 	 *            File containing Lustre program
 	 * @param result
@@ -97,7 +97,7 @@ public class Kind2Api extends KindApi {
 			}
 			monitor.done();
 
-			if (!Set.of(0,10,20).contains(code) && !monitor.isCanceled()) {	
+			if (!Arrays.asList(0, 10, 20).contains(code) && !monitor.isCanceled()) {
 				throw new JKindException("Abnormal termination, exit code " + code);
 			}
 		}
