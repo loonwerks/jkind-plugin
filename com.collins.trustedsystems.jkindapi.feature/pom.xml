@@ -8,7 +8,6 @@
     <version>4.2.0</version>
   </parent>
   <artifactId>com.collins.trustedsystems.jkindapi.feature</artifactId>
-  <version>4.2.0</version>
   <packaging>eclipse-feature</packaging>
   
 	<build>
