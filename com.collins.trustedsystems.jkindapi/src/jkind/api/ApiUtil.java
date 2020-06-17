@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import jkind.JKindException;
 import jkind.api.results.JKindResult;
 import jkind.api.xml.JKindXmlFileInputStream;
 import jkind.api.xml.XmlParseThread;
 import jkind.util.Util;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 public class ApiUtil {
 	public static File writeLustreFile(String program) {
@@ -157,7 +157,7 @@ public class ApiUtil {
 		 * killed. The underlying JKind process would continue to its natural
 		 * end. To avoid this, we search the user's path for the jkind.jar file
 		 * and invoke it directly.
-		 * 
+		 *
 		 * In order to support JKIND_HOME or PATH as the location for JKind, we
 		 * now search in non-windows environments too.
 		 */
