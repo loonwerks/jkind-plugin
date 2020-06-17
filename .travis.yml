@@ -21,11 +21,13 @@ before_install:
   - pip3 install --user GitPython github3.py Mako
   - "./git-setup.sh"
 
+install: /bin/true
+
 script:
-  - python3 jkind_fetcher.py -v -i [Vv]\(\\d+\\.\\d+\\.\\d+\) -e [Vv]\([123]\\.\\d+\\.\\d+\)
+  - mvn clean verify
 
 before_deploy:
-  - export RELEASE_PKG_FILE=$(ls plugin/com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
+  - export RELEASE_PKG_FILE=$(ls com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 
 deploy:
