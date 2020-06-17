@@ -324,8 +324,8 @@
 	</pluginRepositories>
 
 	<scm>
-		<connection>scm:git:git@github.com:loonwerks/jkind-plugin.git</connection>
-		<developerConnection>scm:git:git@github.com:loonwerks/jkind-plugin.git</developerConnection>
+		<connection>scm:git:https://github.com/loonwerks/jkind-plugin.git</connection>
+		<developerConnection>scm:git:https://github.com/loonwerks/jkind-plugin.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
