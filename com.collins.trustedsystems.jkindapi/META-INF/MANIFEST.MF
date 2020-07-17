@@ -22,11 +22,13 @@ Export-Package: com.collins.trustedsystems.jkindapi,
  jkind.lustre.parsing,
  jkind.lustre.values,
  jkind.lustre.visitors,
+ jkind.relational,
  jkind.results,
  jkind.results.layout,
  jkind.translation,
- jkind.util,
- jkind.relational
+ jkind.translation.compound,
+ jkind.translation.tuples,
+ jkind.util
 Bundle-ClassPath: .,
  bin/,
  dependencies/jkind.jar
