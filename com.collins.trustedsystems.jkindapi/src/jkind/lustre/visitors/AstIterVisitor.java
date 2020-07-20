@@ -25,8 +25,8 @@ import jkind.util.Util;
 
 public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, Void> {
 	@Override
-	public Void visit(Assume assumption) {
-		assumption.expr.accept(this);
+	public Void visit(Assume e) {
+		e.expr.accept(this);
 		return null;
 	}
 
@@ -37,16 +37,16 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
-	public Void visit(Contract contract) {
-		visitVarDecls(contract.inputs);
-		visitVarDecls(contract.outputs);
-		visit(contract.contractBody);
+	public Void visit(Contract e) {
+		visitVarDecls(e.inputs);
+		visitVarDecls(e.outputs);
+		visit(e.contractBody);
 		return null;
 	}
 
 	@Override
-	public Void visit(ContractBody contractBody) {
-		visitContractItems(contractBody.items);
+	public Void visit(ContractBody e) {
+		visitContractItems(e.items);
 		return null;
 	}
 
@@ -57,9 +57,9 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
-	public Void visit(ContractImport contractImport) {
-		visitExprs(contractImport.inputs);
-		visitExprs(Util.safeList(contractImport.outputs));
+	public Void visit(ContractImport e) {
+		visitExprs(e.inputs);
+		visitExprs(Util.safeList(e.outputs));
 		return null;
 	}
 
@@ -77,8 +77,8 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
-	public Void visit(Guarantee guarantee) {
-		guarantee.expr.accept(this);
+	public Void visit(Guarantee e) {
+		e.expr.accept(this);
 		return null;
 	}
 
@@ -86,8 +86,8 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	public Void visit(ImportedFunction e) {
 		visitVarDecls(e.inputs);
 		visitVarDecls(e.outputs);
-		// if (contract.contractBody != null) {
-		//	visit(contract.contractBody);
+		// if (e.contractBody != null) {
+		//	visit(e.contractBody);
 		// }
 		return null;
 	}
@@ -96,8 +96,8 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	public Void visit(ImportedNode e) {
 		visitVarDecls(e.inputs);
 		visitVarDecls(e.outputs);
-		// if (contract.contractBody != null) {
-		//	visit(contract.contractBody);
+		// if (e.contractBody != null) {
+		//	visit(e.contractBody);
 		// }
 		return null;
 	}
@@ -113,9 +113,9 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
-	public Void visit(Mode mode) {
-		visitExprs(mode.require);
-		visitExprs(mode.ensure);
+	public Void visit(Mode e) {
+		visitExprs(e.require);
+		visitExprs(e.ensure);
 		return null;
 	}
 
@@ -126,8 +126,8 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 		visitVarDecls(e.locals);
 		visitEquations(e.equations);
 		visitAssertions(e.assertions);
-		// if (contract.contractBody != null) {
-		//	visit(contract.contractBody);
+		// if (e.contractBody != null) {
+		//	visit(e.contractBody);
 		// }
 		return null;
 	}
@@ -220,8 +220,8 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
-	public Void visit(VarDef varDef) {
-		varDef.expr.accept(this);
+	public Void visit(VarDef e) {
+		e.expr.accept(this);
 		return null;
 	}
 }

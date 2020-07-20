@@ -27,8 +27,8 @@ import jkind.lustre.VarDef;
 
 public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Expr> {
 	@Override
-	public Assume visit(Assume assumption) {
-		return new Assume(assumption.location, assumption.expr.accept(this));
+	public Assume visit(Assume e) {
+		return new Assume(e.location, e.expr.accept(this));
 	}
 
 	@Override
@@ -37,17 +37,17 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
-	public Contract visit(Contract contract) {
-		List<VarDecl> inputs = visitVarDecls(contract.inputs);
-		List<VarDecl> outputs = visitVarDecls(contract.outputs);
-		ContractBody contractBody = visit(contract.contractBody);
+	public Contract visit(Contract e) {
+		List<VarDecl> inputs = visitVarDecls(e.inputs);
+		List<VarDecl> outputs = visitVarDecls(e.outputs);
+		ContractBody contractBody = visit(e.contractBody);
 
-		return new Contract(contract.id, inputs, outputs, contractBody);
+		return new Contract(e.id, inputs, outputs, contractBody);
 	}
 
 	@Override
-	public ContractBody visit(ContractBody contractBody) {
-		return new ContractBody(visitContractItems(contractBody.items));
+	public ContractBody visit(ContractBody e) {
+		return new ContractBody(visitContractItems(e.items));
 	}
 
 	protected List<ContractItem> visitContractItems(List<? extends ContractItem> is) {
@@ -72,9 +72,9 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
-	public ContractImport visit(ContractImport contractImport) {
-		return new ContractImport(contractImport.location, contractImport.id, visitExprs(contractImport.inputs),
-				visitExprs(contractImport.outputs).stream().map(e -> (IdExpr) e).collect(Collectors.toList()));
+	public ContractImport visit(ContractImport e) {
+		return new ContractImport(e.location, e.id, visitExprs(e.inputs),
+				visitExprs(e.outputs).stream().map(x -> (IdExpr) x).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
-	public Guarantee visit(Guarantee guarantee) {
-		return new Guarantee(guarantee.location, guarantee.expr.accept(this));
+	public Guarantee visit(Guarantee e) {
+		return new Guarantee(e.location, e.expr.accept(this));
 	}
 
 	public ImportedFunction visit(ImportedFunction e) {
@@ -132,8 +132,8 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
-	public Mode visit(Mode mode) {
-		return new Mode(mode.id, visitExprs(mode.require), visitExprs(mode.ensure));
+	public Mode visit(Mode e) {
+		return new Mode(e.id, visitExprs(e.require), visitExprs(e.ensure));
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 		List<VarDecl> outputs = visitVarDecls(e.outputs);
 		// ContractBody contractBody = null;
 		// if (e.contractBody != null) {
-		// contractBody = visit(e.contractBody);
+		//	contractBody = visit(e.contractBody);
 		// }
 		List<VarDecl> locals = visitVarDecls(e.locals);
 		List<Equation> equations = visitEquations(e.equations);
@@ -198,8 +198,7 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 		List<TypeDef> types = visitTypeDefs(e.types);
 		List<Constant> constants = visitConstants(e.constants);
 		List<Function> functions = visitFunctions(e.functions);
-		// List<ImportedFunction> importedFunctions =
-		// visitImportedFunctions(e.importedFunctions);
+		// List<ImportedFunction> importedFunctions = visitImportedFunctions(e.importedFunctions);
 		// List<ImportedNode> importedNodes = visitImportedNodes(e.importedNodes);
 		// List<Contract> contracts = visitContracts(e.contracts);
 		// List<Kind2Function> kind2Functions = visitKind2Functions(e.kind2Functions);
@@ -252,7 +251,7 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
-	public VarDef visit(VarDef varDef) {
-		return new VarDef(varDef.location, visit(varDef.varDecl), varDef.expr.accept(this));
+	public VarDef visit(VarDef e) {
+		return new VarDef(e.location, visit(e.varDecl), e.expr.accept(this));
 	}
 }
