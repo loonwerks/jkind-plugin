@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jkind.lustre.Contract;
+import jkind.lustre.ContractBody;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
 import jkind.lustre.IdExpr;
@@ -24,7 +24,7 @@ public class NodeBuilder {
 	private List<Expr> assertions = new ArrayList<>();
 	private List<String> ivc = new ArrayList<>();
 	private List<String> realizabilityInputs = null;
-	private Contract contract = null;
+	private ContractBody contractBody = null;
 
 	public NodeBuilder(String id) {
 		this.id = id;
@@ -40,7 +40,7 @@ public class NodeBuilder {
 		this.assertions = new ArrayList<>(node.assertions);
 		this.ivc = new ArrayList<>(node.ivc);
 		this.realizabilityInputs = Util.copyNullable(node.realizabilityInputs);
-		this.contract = node.contract;
+		this.contractBody = node.contractBody;
 	}
 
 	public NodeBuilder setId(String id) {
@@ -183,13 +183,13 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder setContract(Contract contract) {
-		this.contract = contract;
+	public NodeBuilder setContractBody(ContractBody contractBody) {
+		this.contractBody = contractBody;
 		return this;
 	}
 
 	public Node build() {
 		return new Node(Location.NULL, id, inputs, outputs, locals, equations, properties, assertions,
-				realizabilityInputs, contract, ivc);
+				realizabilityInputs, contractBody, ivc);
 	}
 }

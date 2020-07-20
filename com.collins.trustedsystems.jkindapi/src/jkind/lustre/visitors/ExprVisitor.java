@@ -11,6 +11,7 @@ import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
@@ -41,6 +42,8 @@ public interface ExprVisitor<T> {
 	public T visit(IfThenElseExpr e);
 
 	public T visit(IntExpr e);
+
+	public T visit(ModeRefExpr e);
 
 	public T visit(NodeCallExpr e);
 

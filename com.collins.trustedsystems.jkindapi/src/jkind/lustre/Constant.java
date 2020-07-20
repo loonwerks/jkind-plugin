@@ -3,7 +3,7 @@ package jkind.lustre;
 import jkind.Assert;
 import jkind.lustre.visitors.AstVisitor;
 
-public class Constant extends Ast {
+public class Constant extends ContractItem {
 	public final String id;
 	public final Type type;
 	public final Expr expr;

@@ -14,6 +14,7 @@ import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
@@ -91,6 +92,11 @@ public class ExprIterVisitor implements ExprVisitor<Void> {
 
 	@Override
 	public Void visit(IntExpr e) {
+		return null;
+	}
+
+	@Override
+	public Void visit(ModeRefExpr e) {
 		return null;
 	}
 

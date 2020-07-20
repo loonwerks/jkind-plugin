@@ -20,6 +20,7 @@ import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
@@ -93,6 +94,11 @@ public class ExprMapVisitor implements ExprVisitor<Expr> {
 
 	@Override
 	public Expr visit(IntExpr e) {
+		return e;
+	}
+
+	@Override
+	public Expr visit(ModeRefExpr e) {
 		return e;
 	}
 

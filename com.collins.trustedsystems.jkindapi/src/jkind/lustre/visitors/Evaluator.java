@@ -17,6 +17,7 @@ import jkind.lustre.Expr;
 import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
@@ -124,6 +125,11 @@ public abstract class Evaluator implements ExprVisitor<Value> {
 	@Override
 	public Value visit(IntExpr e) {
 		return new IntegerValue(e.value);
+	}
+
+	@Override
+	public Value visit(ModeRefExpr e) {
+		return null;
 	}
 
 	@Override

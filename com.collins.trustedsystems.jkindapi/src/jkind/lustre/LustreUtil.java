@@ -135,6 +135,10 @@ public class LustreUtil {
 		return new IntExpr(i);
 	}
 
+	public static ModeRefExpr modeRef(String... path) {
+		return new ModeRefExpr(path);
+	}
+
 	public static Expr TRUE = new BoolExpr(true);
 	public static Expr FALSE = new BoolExpr(false);
 

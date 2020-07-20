@@ -14,6 +14,7 @@ import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NodeCallExpr;
 import jkind.lustre.RealExpr;
 import jkind.lustre.RecordAccessExpr;
@@ -75,6 +76,11 @@ public class ExprConjunctiveVisitor implements ExprVisitor<Boolean> {
 
 	@Override
 	public Boolean visit(IntExpr e) {
+		return true;
+	}
+
+	@Override
+	public Boolean visit(ModeRefExpr e) {
 		return true;
 	}
 

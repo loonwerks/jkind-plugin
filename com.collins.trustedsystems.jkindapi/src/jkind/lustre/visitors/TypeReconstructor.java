@@ -21,6 +21,7 @@ import jkind.lustre.FunctionCallExpr;
 import jkind.lustre.IdExpr;
 import jkind.lustre.IfThenElseExpr;
 import jkind.lustre.IntExpr;
+import jkind.lustre.ModeRefExpr;
 import jkind.lustre.NamedType;
 import jkind.lustre.Node;
 import jkind.lustre.NodeCallExpr;
@@ -191,6 +192,11 @@ public class TypeReconstructor implements ExprVisitor<Type> {
 	@Override
 	public Type visit(IntExpr e) {
 		return NamedType.INT;
+	}
+
+	@Override
+	public Type visit(ModeRefExpr e) {
+		return NamedType.BOOL;
 	}
 
 	@Override
