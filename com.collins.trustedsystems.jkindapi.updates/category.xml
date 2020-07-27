@@ -3,5 +3,9 @@
    <feature id="com.collins.trustedsystems.jkindapi.feature">
       <category name="jkind"/>
    </feature>
+   <feature id="com.collins.trustedsystems.jkindapi.feature.source">
+      <category name="jkind.source"/>
+   </feature>
    <category-def name="jkind" label="JKind Plug-in (by Collins Aerospace)"/>
+   <category-def name="jkind.source" label="JKind Plug-in  Source Code"/>
 </site>

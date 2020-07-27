@@ -60,9 +60,6 @@
 							<goal>source-feature</goal>
 						</goals>
 						<configuration>
-							<excludes>
-								<feature id="com.collins.trustedsystems.jkindapi.feature" />
-							</excludes>
 						</configuration>
 					</execution>
 				</executions>
