@@ -28,7 +28,11 @@ Export-Package: com.collins.trustedsystems.jkindapi,
  jkind.translation,
  jkind.translation.compound,
  jkind.translation.tuples,
- jkind.util
+ jkind.util,
+ jxl,
+ jxl.format,
+ jxl.write,
+ jxl.write.biff
 Bundle-ClassPath: .,
  bin/,
  dependencies/jkind.jar
