@@ -75,14 +75,14 @@ public class ApiUtil {
 		Process process = null;
 		try (JKindXmlFileInputStream xmlStream = new JKindXmlFileInputStream(xmlFile)) {
 			XmlParseThread parseThread = new XmlParseThread(xmlStream, result, Backend.JKIND);
+			StringBuilder outputText = new StringBuilder();
+			StringBuilder errorText = new StringBuilder();
 
 			try {
 				result.start();
 				process = builder.start();
 				parseThread.start();
-				String output = ApiUtil.readOutput(process, monitor);
-				result.setText(output);
-				debug.println("JKind output", debug.saveFile("jkind-output-", ".txt", output));
+				ApiUtil.readOutputToBuilder(process, monitor, outputText, errorText);
 			} finally {
 				int code = 0;
 				if (process != null) {
@@ -96,6 +96,11 @@ public class ApiUtil {
 
 				xmlStream.done();
 				parseThread.join();
+
+				String output = outputText.toString();
+				String errors = errorText.toString();
+				result.setText(errors + output);
+				debug.println("JKind output", debug.saveFile("jkind-output-", ".txt", errors + output));
 
 				if (monitor.isCanceled()) {
 					result.cancel();
@@ -117,22 +122,39 @@ public class ApiUtil {
 	}
 
 	public static String readOutput(Process process, IProgressMonitor monitor) throws IOException {
+		StringBuilder outputText = new StringBuilder();
+		StringBuilder errorText = new StringBuilder();
+		readOutputToBuilder(process, monitor, outputText, errorText);
+		return errorText.toString() + outputText.toString();
+	}
+
+	public static void readOutputToBuilder(Process process, IProgressMonitor monitor, StringBuilder outputText,
+			StringBuilder errorText)
+			throws IOException {
 		InputStream stream = new BufferedInputStream(process.getInputStream());
-		StringBuilder text = new StringBuilder();
+		InputStream errorStream = new BufferedInputStream(process.getErrorStream());
 
 		while (true) {
-			if (!process.isAlive()) {
-				return text.toString();
-			}
-
 			checkMonitor(monitor, process);
 			while (stream.available() > 0) {
 				int c = stream.read();
 				if (c == -1) {
-					return text.toString();
+					return;
 				}
-				text.append((char) c);
+				outputText.append((char) c);
 				checkMonitor(monitor, process);
+			}
+			while (errorStream.available() > 0) {
+				int c = errorStream.read();
+				if (c == -1) {
+					return;
+				}
+				errorText.append((char) c);
+				checkMonitor(monitor, process);
+			}
+
+			if (!process.isAlive()) {
+				return;
 			}
 
 			try {
