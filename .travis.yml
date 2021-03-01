@@ -32,7 +32,7 @@ before_deploy:
   - rm -rf s3-tools && git clone --depth 1 https://github.com/loonwerks/s3-tools.git
   - export RELEASE_PKG_FILE=$(ls com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
-  - xport SNAPSHOT_NUMBER=$(ls repository/target/repository/plugins/com.collins.trustedsystems.jkindapi_*.jar | grep -o "[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\.[0-9]\\{12\\}")
+  - xport SNAPSHOT_NUMBER=$(ls com.collins.trustedsystems.jkindapi.updates/target/repository/plugins/com.collins.trustedsystems.jkindapi_*.jar | grep -o "[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\.[0-9]\\{12\\}")
   - echo "deploying snapshot number $SNAPSHOT_NUMBER"
 
 deploy:
