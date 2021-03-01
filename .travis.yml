@@ -1,5 +1,5 @@
 sudo: false
-dist: xenial
+dist:  bionic
 lang: java
 jdk:
   - openjdk8
@@ -17,6 +17,8 @@ addons:
     - gradle
 
 before_install:
+  - pip3 install --user --upgrade pip
+  - pip3 install --user testresources
   - pip3 install --user --upgrade setuptools
   - pip3 install --user GitPython github3.py Mako
   - "./git-setup.sh"
@@ -27,6 +29,7 @@ script:
   - mvn clean verify
 
 before_deploy:
+  - rm -rf s3-tools && git clone --depth 1 https://github.com/loonwerks/s3-tools.git
   - export RELEASE_PKG_FILE=$(ls com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 
@@ -37,3 +40,12 @@ deploy:
     on:
       branch: master
       condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
+  - provider: script
+    script: python3 s3-tools/s3tools/DeployToP2CompositeRepository.py --path repository/target/repository --prefix p2/snapshots/jkind-plugin --child-name jkind_plugin_$SNAPSHOT_NUMBER --logging DEBUG
+    skip_cleanup: true
+    on:
+      branch: master
+  - provider: script
+    script: python3 s3-tools/s3tools/ManageSnapshots.py --prefix p2/snapshots/jkind-plugin --logging=DEBUG
+    on:
+      branch: master
