@@ -43,7 +43,7 @@ deploy:
       branch: master
       condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
   - provider: script
-    script: python3 s3-tools/s3tools/DeployToP2CompositeRepository.py --path repository/target/repository --prefix p2/snapshots/jkind-plugin --child-name jkindapi_$SNAPSHOT_NUMBER --logging DEBUG
+    script: python3 s3-tools/s3tools/DeployToP2CompositeRepository.py --path com.collins.trustedsystems.jkindapi.updates/target/repository --prefix p2/snapshots/jkind-plugin --child-name jkindapi_$SNAPSHOT_NUMBER --logging DEBUG
     skip_cleanup: true
     on:
       branch: master
