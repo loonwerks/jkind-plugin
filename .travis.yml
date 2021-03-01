@@ -20,7 +20,7 @@ before_install:
   - pip3 install --user --upgrade pip
   - pip3 install --user testresources
   - pip3 install --user --upgrade setuptools
-  - pip3 install --user GitPython github3.py Mako
+  - pip3 install --user boto3 GitPython github3.py Mako
   - "./git-setup.sh"
 
 install: /bin/true
