@@ -32,6 +32,8 @@ before_deploy:
   - rm -rf s3-tools && git clone --depth 1 https://github.com/loonwerks/s3-tools.git
   - export RELEASE_PKG_FILE=$(ls com.collins.trustedsystems.jkindapi.updates/target/com.collins.trustedsystems.jkindapi.updates-*.zip)
   - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+  - xport SNAPSHOT_NUMBER=$(ls repository/target/repository/plugins/com.collins.trustedsystems.jkindapi_*.jar | grep -o "[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\.[0-9]\\{12\\}")
+  - echo "deploying snapshot number $SNAPSHOT_NUMBER"
 
 deploy:
   # Delete older nightly build releases
@@ -41,7 +43,7 @@ deploy:
       branch: master
       condition: $TRAVIS_EVENT_TYPE =~ ^(api|cron)$
   - provider: script
-    script: python3 s3-tools/s3tools/DeployToP2CompositeRepository.py --path repository/target/repository --prefix p2/snapshots/jkind-plugin --child-name jkind_plugin_$SNAPSHOT_NUMBER --logging DEBUG
+    script: python3 s3-tools/s3tools/DeployToP2CompositeRepository.py --path repository/target/repository --prefix p2/snapshots/jkind-plugin --child-name jkindapi_$SNAPSHOT_NUMBER --logging DEBUG
     skip_cleanup: true
     on:
       branch: master
