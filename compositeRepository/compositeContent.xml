@@ -3,9 +3,9 @@
 <repository name='&quot;Eclipse Project Test Site&quot;'
     type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
   <properties size='1'>
-    <property name='p2.timestamp' value='1605540487202'/>
+    <property name='p2.timestamp' value='1634053890208'/>
   </properties>
-  <children size='7'>
+  <children size='8'>
     <child location='com.collins.trustedsystems.jkindapi_4.0.1'/>
     <child location='com.collins.trustedsystems.jkindapi_4.1.0'/>
     <child location='com.collins.trustedsystems.jkindapi_4.2.0.201911221955'/>
@@ -13,5 +13,6 @@
     <child location='com.collins.trustedsystems.jkindapi_4.3.0.202006171737'/>
     <child location='com.collins.trustedsystems.jkindapi_4.3.1'/>
     <child location='com.collins.trustedsystems.jkindapi_4.4.1'/>
+    <child location='com.collins.trustedsystems.jkindapi_4.4.2'/>
   </children>
 </repository>
