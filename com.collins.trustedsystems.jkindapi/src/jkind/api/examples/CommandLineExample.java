@@ -2,8 +2,7 @@ package jkind.api.examples;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-
+import jkind.api.ApiUtil;
 import jkind.api.JKindApi;
 import jkind.api.results.JKindResult;
 import jkind.api.results.PropertyResult;
@@ -35,7 +34,7 @@ public class CommandLineExample {
 		 * The progress monitor is used to cancel execution if needed. We will
 		 * not use that feature here.
 		 */
-		NullProgressMonitor monitor = new NullProgressMonitor();
+		ApiUtil.NullCancellationMonitor monitor = new ApiUtil.NullCancellationMonitor();
 
 		/*
 		 * This triggers the actual execution of analysis. Options can be set on

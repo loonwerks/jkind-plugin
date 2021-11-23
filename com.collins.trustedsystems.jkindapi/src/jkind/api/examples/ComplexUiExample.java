@@ -6,21 +6,10 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
-import jkind.api.JKindApi;
-import jkind.api.results.AnalysisResult;
-import jkind.api.results.CompositeAnalysisResult;
-import jkind.api.results.JKindResult;
-import jkind.api.results.PropertyResult;
-import jkind.api.results.Renaming;
-import jkind.api.results.Status;
-import jkind.api.ui.results.AnalysisResultTree;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -32,6 +21,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import jkind.api.eclipse.JKindApi;
+import jkind.api.results.AnalysisResult;
+import jkind.api.results.CompositeAnalysisResult;
+import jkind.api.results.JKindResult;
+import jkind.api.results.PropertyResult;
+import jkind.api.results.Renaming;
+import jkind.api.results.Status;
+import jkind.api.ui.results.AnalysisResultTree;
 
 /**
  * This example illustrates how to dynamically report the results of multiple
@@ -168,16 +166,13 @@ public class ComplexUiExample {
 			}
 		});
 
-		tree.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-					if (!sel.isEmpty() && sel.getFirstElement() instanceof PropertyResult) {
-						BasicUiExample.click(parent, (PropertyResult) sel.getFirstElement());
-					} else if (!sel.isEmpty() && sel.getFirstElement() instanceof JKindResult) {
-						click(parent, (JKindResult) sel.getFirstElement());
-					}
+		tree.getViewer().addSelectionChangedListener(event -> {
+			if (event.getSelection() instanceof IStructuredSelection) {
+				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+				if (!sel.isEmpty() && sel.getFirstElement() instanceof PropertyResult) {
+					BasicUiExample.click(parent, (PropertyResult) sel.getFirstElement());
+				} else if (!sel.isEmpty() && sel.getFirstElement() instanceof JKindResult) {
+					click(parent, (JKindResult) sel.getFirstElement());
 				}
 			}
 		});

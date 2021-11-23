@@ -2,7 +2,12 @@ package jkind.api.examples.coverage;
 
 import java.io.File;
 
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import jkind.SolverOption;
+import jkind.api.ApiUtil.NullCancellationMonitor;
 import jkind.api.JKindApi;
 import jkind.api.results.JKindResult;
 import jkind.api.results.PropertyResult;
@@ -12,11 +17,6 @@ import jkind.lustre.parsing.LustreLexer;
 import jkind.lustre.parsing.LustreParser;
 import jkind.lustre.parsing.LustreParser.ProgramContext;
 import jkind.util.Util;
-
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
@@ -52,7 +52,7 @@ public class Main {
 		JKindApi api = new JKindApi();
 		api.setIvcReduction();
 		api.setSolver(SolverOption.Z3);
-		api.execute(program, result, new NullProgressMonitor());
+		api.execute(program, result, new NullCancellationMonitor());
 		return result;
 	}
 

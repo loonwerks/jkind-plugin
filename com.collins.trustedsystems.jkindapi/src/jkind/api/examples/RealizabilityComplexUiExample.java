@@ -5,17 +5,9 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import jkind.api.JRealizabilityApi;
-import jkind.api.results.AnalysisResult;
-import jkind.api.results.CompositeAnalysisResult;
-import jkind.api.results.JRealizabilityResult;
-import jkind.api.ui.results.AnalysisResultTree;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +18,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import jkind.api.eclipse.JRealizabilityApi;
+import jkind.api.results.AnalysisResult;
+import jkind.api.results.CompositeAnalysisResult;
+import jkind.api.results.JRealizabilityResult;
+import jkind.api.ui.results.AnalysisResultTree;
 
 /**
  * This example illustrates how to dynamically report the results of multiple
@@ -155,15 +153,12 @@ public class RealizabilityComplexUiExample {
 			}
 		});
 
-		tree.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-					if (!sel.isEmpty() && sel.getFirstElement() instanceof JRealizabilityResult) {
-						JRealizabilityResult result = (JRealizabilityResult) sel.getFirstElement();
-						RealizabilityBasicUiExample.click(parent, result.getPropertyResult());
-					}
+		tree.getViewer().addSelectionChangedListener(event -> {
+			if (event.getSelection() instanceof IStructuredSelection) {
+				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+				if (!sel.isEmpty() && sel.getFirstElement() instanceof JRealizabilityResult) {
+					JRealizabilityResult result1 = (JRealizabilityResult) sel.getFirstElement();
+					RealizabilityBasicUiExample.click(parent, result1.getPropertyResult());
 				}
 			}
 		});

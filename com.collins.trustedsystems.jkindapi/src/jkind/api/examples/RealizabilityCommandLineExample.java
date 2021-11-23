@@ -2,17 +2,17 @@ package jkind.api.examples;
 
 import java.io.File;
 
-import jkind.api.JRealizabilityApi;
+import org.eclipse.core.runtime.NullProgressMonitor;
+
+import jkind.api.eclipse.JRealizabilityApi;
 import jkind.api.results.JRealizabilityResult;
 import jkind.api.results.PropertyResult;
 import jkind.results.InvalidProperty;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-
 /**
  * This example illustrates how to call the JRealizability API and process the
  * results
- * 
+ *
  * @see CommandLineExample
  */
 public class RealizabilityCommandLineExample {

@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import jkind.api.JKindApi;
+import org.eclipse.core.runtime.NullProgressMonitor;
+
+import jkind.api.eclipse.JKindApi;
 import jkind.api.results.JKindResult;
 import jkind.results.layout.Layout;
-
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 /**
  * This example illustrates how to use a Layout to format counterexamples in the

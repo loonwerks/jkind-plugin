@@ -2,20 +2,10 @@ package jkind.api.examples;
 
 import java.io.File;
 
-import jkind.api.JRealizabilityApi;
-import jkind.api.results.JRealizabilityResult;
-import jkind.api.results.PropertyResult;
-import jkind.api.results.Status;
-import jkind.api.ui.results.AnalysisResultTable;
-import jkind.results.Counterexample;
-import jkind.results.InvalidProperty;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,6 +17,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import jkind.api.eclipse.JRealizabilityApi;
+import jkind.api.results.JRealizabilityResult;
+import jkind.api.results.PropertyResult;
+import jkind.api.results.Status;
+import jkind.api.ui.results.AnalysisResultTable;
+import jkind.results.Counterexample;
+import jkind.results.InvalidProperty;
 
 /**
  * This example illustrates how to dynamically report the results of a JKind API
@@ -97,14 +95,11 @@ public class RealizabilityBasicUiExample {
 			}
 		});
 
-		viewer.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-					if (!sel.isEmpty()) {
-						click(parent, (PropertyResult) sel.getFirstElement());
-					}
+		viewer.getViewer().addSelectionChangedListener(event -> {
+			if (event.getSelection() instanceof IStructuredSelection) {
+				IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+				if (!sel.isEmpty()) {
+					click(parent, (PropertyResult) sel.getFirstElement());
 				}
 			}
 		});

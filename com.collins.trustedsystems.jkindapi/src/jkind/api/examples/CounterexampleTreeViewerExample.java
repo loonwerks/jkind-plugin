@@ -2,17 +2,17 @@ package jkind.api.examples;
 
 import java.io.File;
 
-import jkind.api.JKindApi;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import jkind.api.eclipse.JKindApi;
 import jkind.api.results.JKindResult;
 import jkind.api.results.PropertyResult;
 import jkind.api.ui.counterexample.CounterexampleTreeViewer;
 import jkind.results.Counterexample;
 import jkind.results.InvalidProperty;
-
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 public class CounterexampleTreeViewerExample {
 	public static void main(String[] args) {
@@ -42,8 +42,9 @@ public class CounterexampleTreeViewerExample {
 
 		shell.open();
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 		}
 		display.dispose();
 	}
