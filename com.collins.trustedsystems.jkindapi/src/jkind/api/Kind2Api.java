@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import jkind.JKindException;
+import jkind.api.ApiUtil.ICancellationMonitor;
 import jkind.api.results.JKindResult;
 import jkind.api.workarounds.WorkaroundKind2ForwardReference;
 import jkind.api.xml.XmlParseThread;
@@ -34,11 +35,29 @@ public class Kind2Api extends KindApi {
 	 * @throws jkind.JKindException
 	 */
 	@Override
-	public void execute(Program program, JKindResult result, IProgressMonitor monitor) {
+	public void execute(Program program, JKindResult result, ICancellationMonitor monitor) {
 		program = WorkaroundKind2ForwardReference.program(program);
 		Kind2ArraysPrettyPrintVisitor kind2Printer = new Kind2ArraysPrettyPrintVisitor();
 		program.accept(kind2Printer);
 		execute(kind2Printer.toString(), result, monitor);
+	}
+
+	/**
+	 * Run Kind on a Lustre program
+	 *
+	 * @param program
+	 *            Lustre program
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2Api.execute()} instead.
+	 */
+	@Deprecated
+	@Override
+	public void execute(Program program, JKindResult result, IProgressMonitor monitor) {
+		execute(program, result, new jkind.api.eclipse.ApiUtil.CancellationMonitor(monitor));
 	}
 
 	/**
@@ -53,7 +72,7 @@ public class Kind2Api extends KindApi {
 	 * @throws jkind.JKindException
 	 */
 	@Override
-	public void execute(File lustreFile, JKindResult result, IProgressMonitor monitor) {
+	public void execute(File lustreFile, JKindResult result, ICancellationMonitor monitor) {
 		debug.println("Lustre file", lustreFile);
 		try {
 			callKind2(lustreFile, result, monitor);
@@ -64,7 +83,25 @@ public class Kind2Api extends KindApi {
 		}
 	}
 
-	private void callKind2(File lustreFile, JKindResult result, IProgressMonitor monitor)
+	/**
+	 * Run Kind2 on a Lustre program
+	 *
+	 * @param lustreFile
+	 *            File containing Lustre program
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2Api.execute()} instead.
+	 */
+	@Deprecated
+	@Override
+	public void execute(File lustreFile, JKindResult result, IProgressMonitor monitor) {
+		execute(lustreFile, result, new jkind.api.eclipse.ApiUtil.CancellationMonitor(monitor));
+	}
+
+	private void callKind2(File lustreFile, JKindResult result, ICancellationMonitor monitor)
 			throws IOException, InterruptedException {
 		ProcessBuilder builder = getKind2ProcessBuilder(lustreFile);
 		debug.println("Kind 2 command: " + ApiUtil.getQuotedCommand(builder.command()));

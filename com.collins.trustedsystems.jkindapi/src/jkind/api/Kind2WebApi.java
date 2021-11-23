@@ -8,12 +8,13 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import jkind.JKindException;
+import jkind.api.ApiUtil.ICancellationMonitor;
 import jkind.api.results.JKindResult;
 import jkind.api.xml.Kind2WebInputStream;
 import jkind.api.xml.XmlParseThread;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * The web-based interface to Kind2.
@@ -32,7 +33,7 @@ public class Kind2WebApi extends Kind2Api {
 
 	/**
 	 * Run Kind2 on a Lustre program
-	 * 
+	 *
 	 * @param lustreFile
 	 *            File containing Lustre program
 	 * @param result
@@ -41,6 +42,24 @@ public class Kind2WebApi extends Kind2Api {
 	 *            Used to check for cancellation
 	 * @throws jkind.JKindException
 	 */
+	@Override
+	public void execute(File lustreFile, JKindResult result, ICancellationMonitor monitor) {
+		execute(readFile(lustreFile), result, monitor);
+	}
+
+	/**
+	 * Run Kind2 on a Lustre program
+	 *
+	 * @param lustreFile
+	 *            File containing Lustre program
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2WebApi.execute()} instead.
+	 */
+	@Deprecated
 	@Override
 	public void execute(File lustreFile, JKindResult result, IProgressMonitor monitor) {
 		execute(readFile(lustreFile), result, monitor);
@@ -56,7 +75,7 @@ public class Kind2WebApi extends Kind2Api {
 
 	/**
 	 * Run Kind2 on a Lustre program
-	 * 
+	 *
 	 * @param program
 	 *            Lustre program as text
 	 * @param result
@@ -66,7 +85,7 @@ public class Kind2WebApi extends Kind2Api {
 	 * @throws jkind.JKindException
 	 */
 	@Override
-	public void execute(String program, JKindResult result, IProgressMonitor monitor) {
+	public void execute(String program, JKindResult result, ICancellationMonitor monitor) {
 		XmlParseThread parseThread = null;
 
 		debug.println("Kind 2 URI: " + uri);
@@ -95,6 +114,24 @@ public class Kind2WebApi extends Kind2Api {
 		if (parseThread.getThrowable() != null) {
 			throw new JKindException("Error parsing XML", parseThread.getThrowable());
 		}
+	}
+
+	/**
+	 * Run Kind2 on a Lustre program
+	 *
+	 * @param program
+	 *            Lustre program as text
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2WebApi.execute()} instead.
+	 */
+	@Deprecated
+	@Override
+	public void execute(String program, JKindResult result, IProgressMonitor monitor) {
+		execute(program, result, new jkind.api.eclipse.ApiUtil.CancellationMonitor(monitor));
 	}
 
 	@Override

@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import jkind.JKindException;
+import jkind.api.ApiUtil.ICancellationMonitor;
 import jkind.api.results.JKindResult;
 import jkind.api.xml.XmlParseThread;
 import jkind.lustre.Program;
 import jkind.lustre.visitors.PrettyPrintVisitor;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * The primary interface to Sally.
@@ -32,10 +33,28 @@ public class SallyApi extends KindApi {
 	 * @throws jkind.JKindException
 	 */
 	@Override
-	public void execute(Program program, JKindResult result, IProgressMonitor monitor) {
+	public void execute(Program program, JKindResult result, ICancellationMonitor monitor) {
 		PrettyPrintVisitor printer = new PrettyPrintVisitor();
 		program.accept(printer);
 		execute(printer.toString(), result, monitor);
+	}
+
+	/**
+	 * Run Sally on a Lustre program
+	 *
+	 * @param program
+	 *            Lustre program
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2Api.execute()} instead.
+	 */
+	@Deprecated
+	@Override
+	public void execute(Program program, JKindResult result, IProgressMonitor monitor) {
+		execute(program, result, new jkind.api.eclipse.ApiUtil.CancellationMonitor(monitor));
 	}
 
 	/**
@@ -50,7 +69,7 @@ public class SallyApi extends KindApi {
 	 * @throws jkind.JKindException
 	 */
 	@Override
-	public void execute(File lustreFile, JKindResult result, IProgressMonitor monitor) {
+	public void execute(File lustreFile, JKindResult result, ICancellationMonitor monitor) {
 		debug.println("Lustre file", lustreFile);
 		try {
 			callSally(lustreFile, result, monitor);
@@ -61,7 +80,25 @@ public class SallyApi extends KindApi {
 		}
 	}
 
-	private void callSally(File lustreFile, JKindResult result, IProgressMonitor monitor)
+	/**
+	 * Run Sally on a Lustre program
+	 *
+	 * @param lustreFile
+	 *            File containing Lustre program
+	 * @param result
+	 *            Place to store results as they come in
+	 * @param monitor
+	 *            Used to check for cancellation
+	 * @throws jkind.JKindException
+	 * @deprecated To be removed in 5.0.  Use {@link jkind.api.eclipse.Kind2Api.execute()} instead.
+	 */
+	@Deprecated
+	@Override
+	public void execute(File lustreFile, JKindResult result, IProgressMonitor monitor) {
+		execute(lustreFile, result, new jkind.api.eclipse.ApiUtil.CancellationMonitor(monitor));
+	}
+
+	private void callSally(File lustreFile, JKindResult result, ICancellationMonitor monitor)
 			throws IOException, InterruptedException {
 		ProcessBuilder builder = getSallyProcessBuilder(lustreFile);
 		debug.println("Sally command: " + ApiUtil.getQuotedCommand(builder.command()));
