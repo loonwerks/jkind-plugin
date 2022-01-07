@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.collins.trustedsystems.jkind</groupId>
         <artifactId>com.collins.trustedsystems.jkindapi.parent</artifactId>
-        <version>4.4.4-SNAPSHOT</version>
+        <version>4.5.0</version>
     </parent>
     <artifactId>com.collins.trustedsystems.jkindapi.updates</artifactId>
     <packaging>eclipse-repository</packaging>
